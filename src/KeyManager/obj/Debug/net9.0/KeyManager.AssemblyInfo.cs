@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("KeyManager")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+449c14135436fbe3b646f7dd26b8a42b3dd4a902")]
 [assembly: System.Reflection.AssemblyProductAttribute("KeyManager")]
 [assembly: System.Reflection.AssemblyTitleAttribute("KeyManager")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
