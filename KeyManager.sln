@@ -8,6 +8,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeyManager.Domain", "src\Ke
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeyManager.DataAccess", "src\KeyManager.DataAccess\KeyManager.DataAccess.csproj", "{586058F1-7CF2-4975-9171-D25313C1EA24}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeyManager.Application", "src\KeyManager.Application\KeyManager.Application.csproj", "{4846A813-BAFC-4575-AF65-734A182F6A93}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeyManager.Infrastructure", "src\KeyManager.Infrastructure\KeyManager.Infrastructure.csproj", "{1E5B7664-5503-487D-A2E4-751F871840DE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,10 +30,20 @@ Global
 		{586058F1-7CF2-4975-9171-D25313C1EA24}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{586058F1-7CF2-4975-9171-D25313C1EA24}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{586058F1-7CF2-4975-9171-D25313C1EA24}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4846A813-BAFC-4575-AF65-734A182F6A93}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4846A813-BAFC-4575-AF65-734A182F6A93}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4846A813-BAFC-4575-AF65-734A182F6A93}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4846A813-BAFC-4575-AF65-734A182F6A93}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1E5B7664-5503-487D-A2E4-751F871840DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1E5B7664-5503-487D-A2E4-751F871840DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1E5B7664-5503-487D-A2E4-751F871840DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1E5B7664-5503-487D-A2E4-751F871840DE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{191501D3-6F92-41B0-BCC0-4C30E98815B4} = {4C4A0E1F-0E80-42E7-A964-F4BBC879E517}
 		{86FB4202-91BD-4D0F-BFCF-B80F0EC07774} = {4C4A0E1F-0E80-42E7-A964-F4BBC879E517}
 		{586058F1-7CF2-4975-9171-D25313C1EA24} = {4C4A0E1F-0E80-42E7-A964-F4BBC879E517}
+		{4846A813-BAFC-4575-AF65-734A182F6A93} = {4C4A0E1F-0E80-42E7-A964-F4BBC879E517}
+		{1E5B7664-5503-487D-A2E4-751F871840DE} = {4C4A0E1F-0E80-42E7-A964-F4BBC879E517}
 	EndGlobalSection
 EndGlobal

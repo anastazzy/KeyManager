@@ -18,11 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\KeyManager.Application\KeyManager.Application.csproj" />
     <ProjectReference Include="..\KeyManager.DataAccess\KeyManager.DataAccess.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
+    <ProjectReference Include="..\KeyManager.Infrastructure\KeyManager.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>
