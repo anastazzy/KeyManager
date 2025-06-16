@@ -1,5 +1,6 @@
 ﻿using KeyManager.Application.Contracts;
 using KeyManager.Application.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KeyManager.API.Controllers;
@@ -10,7 +11,7 @@ public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
 
-    public UserController(IUserService userService, IConfiguration configuration)
+    public UserController(IUserService userService)
     {
         _userService = userService;
     }
@@ -26,7 +27,13 @@ public class UserController : ControllerBase
     public async Task<ActionResult> LoginAsync([FromBody] LoginUserRequest request)
     {
         var token = await _userService.LoginAsync(request);
-
-        return Ok(token);
+        return string.IsNullOrEmpty(token) ? NotFound() : Ok(token);
+    }
+    
+    [Authorize]
+    [HttpGet("test")]
+    public async Task<ActionResult> GetAsync([FromHeader]string token)
+    {
+        return  Ok();
     }
 }

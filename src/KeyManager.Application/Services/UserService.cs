@@ -3,6 +3,7 @@ using KeyManager.Application.Requests;
 using KeyManager.DataAccess;
 using KeyManager.Infrastructure.Contracts;
 using KeysManager.Domain.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace KeyManager.Application.Services;
 
@@ -10,13 +11,15 @@ public class UserService : IUserService
 {
     private readonly KeyManagerDbContext _dbContext;
     private readonly IPasswordHasher _passwordHasher;
+    private readonly IJwtProvider _jwtProvider;
 
-    public UserService(KeyManagerDbContext dbContext, IPasswordHasher passwordHasher)
+    public UserService(KeyManagerDbContext dbContext, IPasswordHasher passwordHasher, IJwtProvider jwtProvider)
     {
         _dbContext = dbContext;
         _passwordHasher = passwordHasher;
+        _jwtProvider = jwtProvider;
     }
-    
+
     public async Task<Guid> RegisterAsync(LoginUserRequest request)
     {
         var hash = _passwordHasher.GetHash(request.Password);
@@ -27,8 +30,15 @@ public class UserService : IUserService
         return user.Id;
     }
 
-    public Task<string> LoginAsync(LoginUserRequest request)
+    public async Task<string> LoginAsync(LoginUserRequest request)
     {
-        throw new NotImplementedException();
+        var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == request.Email);
+        if (user is null) return string.Empty;
+
+        var isPasswordMatches = _passwordHasher.Verify(request.Password, user.Password);
+        if (!isPasswordMatches) return string.Empty;
+
+        var token = _jwtProvider.GenerateAccessJwtToken(user.Id, user.Email);
+        return token;
     }
 }

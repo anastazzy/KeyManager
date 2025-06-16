@@ -13,13 +13,13 @@ public class JwtProvider(IOptions<JwtOptions> settings) : IJwtProvider
     private const string SigningAlgorithm = SecurityAlgorithms.HmacSha256;
     private readonly JwtOptions _options = settings.Value;
 
-    public string GenerateAccessJwtToken(string userId, string username)
+    public string GenerateAccessJwtToken(Guid userId, string email)
     {
         var securityKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_options.SecretKey));
         var claims = new[]
         {
-            new Claim(ClaimTypes.Name, username),
-            new Claim(ClaimTypes.Sid, userId),
+            new Claim(ClaimTypes.Name, email),
+            new Claim(ClaimTypes.Sid, userId.ToString()),
         };
 
         var token = new JwtSecurityToken(

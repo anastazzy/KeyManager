@@ -2,5 +2,5 @@
 
 public interface IJwtProvider
 {
-    string GenerateAccessJwtToken(string userId, string username);
+    string GenerateAccessJwtToken(Guid userId, string email);
 }
