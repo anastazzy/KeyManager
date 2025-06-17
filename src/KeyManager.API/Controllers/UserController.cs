@@ -32,7 +32,7 @@ public class UserController : ControllerBase
     
     [Authorize]
     [HttpGet("test")]
-    public async Task<ActionResult> GetAsync([FromHeader]string token)
+    public async Task<ActionResult> GetAsync()
     {
         return  Ok();
     }

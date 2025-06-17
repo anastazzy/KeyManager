@@ -23,15 +23,6 @@ public static class ApiExtension
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtOptions)),
                 };
-                
-                options.Events = new JwtBearerEvents
-                {
-                    OnMessageReceived = context =>
-                    {
-                        context.Token = context.Request.Headers["token"];
-                        return Task.CompletedTask;
-                    }
-                };
             });
 
         services.AddAuthorization();
