@@ -2,7 +2,9 @@
 using KeyManager.Application.Requests;
 using KeyManager.DataAccess;
 using KeyManager.Infrastructure.Contracts;
+using KeyManager.MailService;
 using KeysManager.Domain.Models;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace KeyManager.Application.Services;
@@ -12,12 +14,14 @@ public class UserService : IUserService
     private readonly KeyManagerDbContext _dbContext;
     private readonly IPasswordHasher _passwordHasher;
     private readonly IJwtProvider _jwtProvider;
+    private readonly IEmailService _emailService;
 
-    public UserService(KeyManagerDbContext dbContext, IPasswordHasher passwordHasher, IJwtProvider jwtProvider)
+    public UserService(KeyManagerDbContext dbContext, IPasswordHasher passwordHasher, IJwtProvider jwtProvider, IEmailService emailService)
     {
         _dbContext = dbContext;
         _passwordHasher = passwordHasher;
         _jwtProvider = jwtProvider;
+        _emailService = emailService;
     }
 
     public async Task<Guid> RegisterAsync(LoginUserRequest request)
@@ -27,6 +31,8 @@ public class UserService : IUserService
 
         await _dbContext.Users.AddAsync(user);
         await _dbContext.SaveChangesAsync();
+
+        await _emailService.SendEmailAsync(user.Email, "info", "yesssss, you registered!");
         return user.Id;
     }
 

@@ -5,6 +5,7 @@ using KeyManager.DataAccess;
 using KeyManager.Infrastructure.Contracts;
 using KeyManager.Infrastructure.Dtos;
 using KeyManager.Infrastructure.Services;
+using KeyManager.MailService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -17,8 +18,10 @@ builder.Services.AddTransient<IJwtProvider, JwtProvider>();
 builder.Services.AddTransient<IPasswordHasher, PasswordHasher>();
 
 builder.Services.AddTransient<IUserService, UserService>();
+builder.Services.AddTransient<IEmailService, EmailService>();
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JwtOptions"));
+builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("SmtpOptions"));
 
 builder.Services.AddApiAuthentication(builder.Configuration);
 builder.Services.AddControllers();

@@ -12,6 +12,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeyManager.Application", "s
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeyManager.Infrastructure", "src\KeyManager.Infrastructure\KeyManager.Infrastructure.csproj", "{1E5B7664-5503-487D-A2E4-751F871840DE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KeyManager.MailService", "src\KeyManager.MailService\KeyManager.MailService.csproj", "{BCEF7EFF-2834-4E46-B1D5-8B950885695B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -38,6 +40,10 @@ Global
 		{1E5B7664-5503-487D-A2E4-751F871840DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E5B7664-5503-487D-A2E4-751F871840DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E5B7664-5503-487D-A2E4-751F871840DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCEF7EFF-2834-4E46-B1D5-8B950885695B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCEF7EFF-2834-4E46-B1D5-8B950885695B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCEF7EFF-2834-4E46-B1D5-8B950885695B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCEF7EFF-2834-4E46-B1D5-8B950885695B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{191501D3-6F92-41B0-BCC0-4C30E98815B4} = {4C4A0E1F-0E80-42E7-A964-F4BBC879E517}
@@ -45,5 +51,6 @@ Global
 		{586058F1-7CF2-4975-9171-D25313C1EA24} = {4C4A0E1F-0E80-42E7-A964-F4BBC879E517}
 		{4846A813-BAFC-4575-AF65-734A182F6A93} = {4C4A0E1F-0E80-42E7-A964-F4BBC879E517}
 		{1E5B7664-5503-487D-A2E4-751F871840DE} = {4C4A0E1F-0E80-42E7-A964-F4BBC879E517}
+		{BCEF7EFF-2834-4E46-B1D5-8B950885695B} = {4C4A0E1F-0E80-42E7-A964-F4BBC879E517}
 	EndGlobalSection
 EndGlobal

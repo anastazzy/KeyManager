@@ -13,6 +13,7 @@
   <ItemGroup>
     <ProjectReference Include="..\KeyManager.DataAccess\KeyManager.DataAccess.csproj" />
     <ProjectReference Include="..\KeyManager.Infrastructure\KeyManager.Infrastructure.csproj" />
+    <ProjectReference Include="..\KeyManager.MailService\KeyManager.MailService.csproj" />
   </ItemGroup>
 
 </Project>
