@@ -19,7 +19,7 @@ public class UserController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> RegisterAsync([FromBody] LoginUserRequest request)
     {
-        var newUserId = await _userService.RegisterAsync(request);
+        var newUserId = await _userService.RegisterAsync(request, $"{Url.ActionLink()}/confirmation");
         return newUserId == Guid.Empty ? BadRequest() : Ok();
     }
 
@@ -29,11 +29,18 @@ public class UserController : ControllerBase
         var token = await _userService.LoginAsync(request);
         return string.IsNullOrEmpty(token) ? NotFound() : Ok(token);
     }
-    
+
+    [HttpGet("confirmation")]
+    public async Task<ActionResult> ConfirmEmailAsync([FromQuery] string token)
+    {
+        var isSuccess = await _userService.ConfirmEmailAsync(token);
+        return Ok(isSuccess ? "Email successful confirmed" : "Link is invalid");
+    }
+
     [Authorize]
     [HttpGet("test")]
     public async Task<ActionResult> GetAsync()
     {
-        return  Ok();
+        return Ok();
     }
 }

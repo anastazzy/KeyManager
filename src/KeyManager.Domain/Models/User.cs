@@ -18,9 +18,10 @@ public class User
     {
     }
 
-    public User(string email, string password)
+    public User(string email, string password, string confirmationCode)
     {
         Email = email;
         Password = password;
+        ConfirmationCode = confirmationCode;
     }
 }

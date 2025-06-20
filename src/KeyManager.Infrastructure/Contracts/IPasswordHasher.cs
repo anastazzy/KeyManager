@@ -1,6 +1,4 @@
-﻿using KeyManager.Infrastructure.Dtos;
-
-namespace KeyManager.Infrastructure.Contracts;
+﻿namespace KeyManager.Infrastructure.Contracts;
 
 public interface IPasswordHasher
 {
