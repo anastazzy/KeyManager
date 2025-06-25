@@ -6,6 +6,6 @@ namespace KeyManager.Application.Contracts;
 public interface IUserService
 {
     Task<ResultDto> RegisterAsync(LoginUserRequest request, string link);
-    Task<string> LoginAsync(LoginUserRequest request);
-    Task<bool> ConfirmEmailAsync(string token);
+    Task<LoginResultDto> LoginAsync(LoginUserRequest request);
+    Task<ResultDto> ConfirmEmailAsync(string token);
 }

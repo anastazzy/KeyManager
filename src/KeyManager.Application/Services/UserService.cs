@@ -24,6 +24,12 @@ public class UserService : IUserService
     private const string ErrorWhenMailWasNotSend = "Аn error occurred while sending the message";
     private const string SuccessSendMessage = "An email has been sent to the specified email address. Confirm your login by clicking on the link from the email.";
 
+    private const string ErrorThenEmailNotExists = "Email not registered in system";
+    private const string ErrorThenEmailNotConfirmed = "Email not confirmed";
+    private const string ErrorThenWrongPassword = "Wrong passsword";
+
+    private const string EmailSuccessfulConfirmed = "Email successful confirmed";
+
     public UserService(KeyManagerDbContext dbContext, IPasswordHasher passwordHasher, IJwtProvider jwtProvider, IEmailService emailService)
     {
         _dbContext = dbContext;
@@ -48,7 +54,6 @@ public class UserService : IUserService
         await _dbContext.Users.AddAsync(user);
         await _dbContext.SaveChangesAsync();
 
-        
         var result = new ResultDto();
         var confirmationLink = QueryHelpers.AddQueryString(link, new Dictionary<string, string?> { { "token", user.ConfirmationCode } });
         try
@@ -63,30 +68,54 @@ public class UserService : IUserService
             Console.WriteLine(e);
             throw;
         }
-        
+
         return result;
     }
 
-    public async Task<string> LoginAsync(LoginUserRequest request)
+    public async Task<LoginResultDto> LoginAsync(LoginUserRequest request)
     {
+        var result = new LoginResultDto();
         var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == request.Email);
-        if (user is null || !user.IsEmailConfirmed) return string.Empty;
+        if (user is null)
+        {
+            result.IsSuccess = false;
+            result.Message = ErrorThenEmailNotExists;
+            return result;
+        }
+
+        if (!user.IsEmailConfirmed)
+        {
+            result.IsSuccess = false;
+            result.Message = ErrorThenEmailNotConfirmed;
+            return result;
+        }
 
         var isPasswordMatches = _passwordHasher.Verify(request.Password, user.Password);
-        if (!isPasswordMatches) return string.Empty;
+        if (!isPasswordMatches)
+        {
+            result.IsSuccess = false;
+            result.Message = ErrorThenWrongPassword;
+            return result;
+        }
 
-        var token = _jwtProvider.GenerateAccessJwtToken(user.Id, user.Email);
-        return token;
+        result.Token = _jwtProvider.GenerateAccessJwtToken(user.Id, user.Email);
+        return result;
     }
 
-    public async Task<bool> ConfirmEmailAsync(string token)
+    public async Task<ResultDto> ConfirmEmailAsync(string token)
     {
+        var result = new ResultDto();
         var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.ConfirmationCode == token);
         if (user is null)
-            return false;
+        {
+            result.IsSuccess = false;
+            result.Message = ErrorThenEmailNotExists;
+            return result;
+        }
 
         user.IsEmailConfirmed = true;
         await _dbContext.SaveChangesAsync();
-        return true;
+        result.Message = EmailSuccessfulConfirmed;
+        return result;
     }
 }

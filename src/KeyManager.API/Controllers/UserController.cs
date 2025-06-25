@@ -26,15 +26,15 @@ public class UserController : ControllerBase
     [HttpPost("login")]
     public async Task<ActionResult> LoginAsync([FromBody] LoginUserRequest request)
     {
-        var token = await _userService.LoginAsync(request);
-        return string.IsNullOrEmpty(token) ? NotFound() : Ok(token);
+        var result = await _userService.LoginAsync(request);
+        return result.IsSuccess ? Ok(result) : BadRequest(result);
     }
 
     [HttpGet("confirmation")]
     public async Task<ActionResult> ConfirmEmailAsync([FromQuery] string token)
     {
-        var isSuccess = await _userService.ConfirmEmailAsync(token);
-        return Ok(isSuccess ? "Email successful confirmed" : "Link is invalid");
+        var result = await _userService.ConfirmEmailAsync(token);
+        return result.IsSuccess ? Ok(result) : BadRequest(result);
     }
 
     [Authorize]
