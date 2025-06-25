@@ -19,8 +19,8 @@ public class UserController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> RegisterAsync([FromBody] LoginUserRequest request)
     {
-        var newUserId = await _userService.RegisterAsync(request, $"{Url.ActionLink()}/confirmation");
-        return newUserId == Guid.Empty ? BadRequest() : Ok();
+        var result = await _userService.RegisterAsync(request, $"{Url.ActionLink()}/confirmation");
+        return result.IsSuccess ? Ok(result) : BadRequest(result);
     }
 
     [HttpPost("login")]
