@@ -37,7 +37,7 @@ public class ApiKeyService : IApiKeyService
         await _dbContext.AddAsync(model);
         await _dbContext.SaveChangesAsync();
 
-        return new ResultDto(model.Id == Guid.Empty);
+        return new ResultDto(model.Id != Guid.Empty);
     }
 
     public async Task RemoveKeyAsync(Guid id)
@@ -58,7 +58,7 @@ public class ApiKeyService : IApiKeyService
         toUpdate.Name = name;
         _dbContext.Update(toUpdate);
         await _dbContext.SaveChangesAsync();
-        
+
         return new ResultDto();
     }
 }
