@@ -19,6 +19,7 @@ builder.Services.AddTransient<IPasswordHasher, PasswordHasher>();
 
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IEmailService, EmailService>();
+builder.Services.AddTransient<IApiKeyService, ApiKeyService>();
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JwtOptions"));
 builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("SmtpOptions"));
