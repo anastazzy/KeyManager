@@ -118,4 +118,14 @@ public class UserService : IUserService
         result.Message = EmailSuccessfulConfirmed;
         return result;
     }
+
+    public async Task<User> GetByApiKeyAsync(Guid apiKeyGuid)
+    {
+        var key = await _dbContext.ApiKeys
+            .Where(x => x.Id == apiKeyGuid)
+            .Include(x => x.User)
+            .FirstAsync();
+        
+        return key.User;
+    }
 }

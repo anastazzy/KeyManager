@@ -3,8 +3,22 @@
 public class Transaction
 {
     public long Id { get; set; }
-    
+
     public decimal Amount { get; set; }
-    
+
     public DateTime? ConfirmedAt { get; set; }
+    public DateTime CreateDateTime { get; set; } = DateTime.UtcNow;
+
+    public Guid ApiKeyIdId { get; set; }
+    public ApiKey? ApiKey { get; set; }
+
+    public Transaction()
+    {
+    }
+
+    public Transaction(decimal amount, Guid apiKeyId)
+    {
+        Amount = amount;
+        ApiKeyIdId = apiKeyId;
+    }
 }
