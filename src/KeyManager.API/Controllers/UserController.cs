@@ -1,6 +1,5 @@
 ﻿using KeyManager.Application.Contracts;
 using KeyManager.Application.Requests;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KeyManager.API.Controllers;
@@ -35,12 +34,5 @@ public class UserController : ControllerBase
     {
         var result = await _userService.ConfirmEmailAsync(token);
         return result.IsSuccess ? Ok(result) : BadRequest(result);
-    }
-
-    [Authorize]
-    [HttpGet("test")]
-    public async Task<ActionResult> GetAsync()
-    {
-        return Ok();
     }
 }
