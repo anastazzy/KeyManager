@@ -38,7 +38,7 @@ public class TransactionService : ITransactionService
         return new ResultDto();
     }
 
-    public async Task<ResultDto> ConfirmTransaction(Guid apiKeyId, long transactionId)
+    public async Task<ResultDto> ConfirmTransactionAsync(Guid apiKeyId, long transactionId)
     {
         var transaction = await _dbContext.Transactions.FirstOrDefaultAsync(x => x.Id == transactionId);
         if (transaction is null)

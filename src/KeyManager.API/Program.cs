@@ -20,6 +20,10 @@ builder.Services.AddTransient<IPasswordHasher, PasswordHasher>();
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddTransient<IApiKeyService, ApiKeyService>();
+builder.Services.AddTransient<ITransactionService, TransactionService>();
+builder.Services.AddTransient<IServiceApiKeyManager, ServiceApiKeyManager>();
+
+builder.Services.AddScoped<ServiceAuthorizationActionFilter>();
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JwtOptions"));
 builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("SmtpOptions"));
@@ -49,6 +53,7 @@ builder.Services.AddSwaggerGen(options =>
             Array.Empty<string>()
         }
     });
+    options.AddOperationFilterInstance(new SwaggerHeaderOptions());
 });
 
 var app = builder.Build();

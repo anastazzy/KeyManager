@@ -12,4 +12,5 @@ public sealed class KeyManagerDbContext : DbContext
     public DbSet<User> Users { get; set; }
     public DbSet<ApiKey> ApiKeys { get; set; }
     public DbSet<Transaction> Transactions { get; set; }
+    public DbSet<ServiceApiKey> ServiceApiKeys { get; set; }
 }
