@@ -18,24 +18,33 @@ public class TransactionLifetimeChecker : BackgroundService
         {
             await using var scope = _serviceProviderFactory.CreateAsyncScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<KeyManagerDbContext>();
-            var now = DateTime.UtcNow;
 
-            var transactionsForCheck = dbContext.Transactions.Where(x => x.ConfirmedAt == null).ToList();
+            var now = DateTime.UtcNow;
+            var transactionsForCheck = dbContext.Transactions
+                .Where(x => x.ConfirmedAt == null && x.Amount != 0)
+                .ToList();
+
+            if (transactionsForCheck.Count == 0) 
+                await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
 
             var toReturnAmount = transactionsForCheck
-                .Where(x => x.Amount != 0 && now - x.CreateDateTime > TimeSpan.FromMinutes(10));
-            foreach (var item in toReturnAmount)
+                .Where(x => now - x.CreateDateTime > TimeSpan.FromMinutes(10)).ToArray();
+
+            if (toReturnAmount.Length > 0)
             {
-                var apiKey = await dbContext.ApiKeys
-                    .Where(x => x.Id == item.ApiKeyIdId)
-                    .Include(x => x.User)
-                    .FirstAsync(stoppingToken);
+                foreach (var item in toReturnAmount)
+                {
+                    var apiKey = await dbContext.ApiKeys
+                        .Where(x => x.Id == item.ApiKeyIdId)
+                        .Include(x => x.User)
+                        .FirstAsync(stoppingToken);
 
-                if (apiKey.User != null) apiKey.User.Balance += item.Amount;
-                item.Amount = 0;
+                    if (apiKey.User != null) apiKey.User.Balance += item.Amount;
+                    item.Amount = 0;
+                }
+
+                await dbContext.SaveChangesAsync(stoppingToken);
             }
-
-            await dbContext.SaveChangesAsync(stoppingToken);
 
             await Task.Delay(TimeSpan.FromSeconds(30), stoppingToken);
         }

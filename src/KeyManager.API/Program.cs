@@ -1,3 +1,4 @@
+using KeyManager.API.BackgroundServices;
 using KeyManager.API.Extensions;
 using KeyManager.API.Utils;
 using KeyManager.Application.Contracts;
@@ -17,12 +18,12 @@ builder.Services.AddDbContext<KeyManagerDbContext>(x =>
 
 builder.Services.AddTransient<IJwtProvider, JwtProvider>();
 builder.Services.AddTransient<IPasswordHasher, PasswordHasher>();
-
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IEmailService, EmailService>();
 builder.Services.AddTransient<IApiKeyService, ApiKeyService>();
 builder.Services.AddTransient<ITransactionService, TransactionService>();
 builder.Services.AddTransient<IServiceApiKeyManager, ServiceApiKeyManager>();
+builder.Services.AddHostedService<TransactionLifetimeChecker>();
 
 builder.Services.AddScoped<ServiceAuthorizationActionFilter>();
 
