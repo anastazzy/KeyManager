@@ -10,5 +10,5 @@ public interface IUserService
     Task<LoginResultDto> LoginAsync(LoginUserRequest request);
     Task<ResultDto> ConfirmEmailAsync(string token);
 
-    Task<User> GetByApiKeyAsync(Guid apiKeyGuid);
+    Task<User?> GetByApiKeyAsync(Guid apiKeyGuid);
 }

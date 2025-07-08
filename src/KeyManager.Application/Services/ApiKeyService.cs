@@ -3,6 +3,7 @@ using KeyManager.Application.Dtos;
 using KeyManager.DataAccess;
 using KeysManager.Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace KeyManager.Application.Services;
 
@@ -36,6 +37,7 @@ public class ApiKeyService : IApiKeyService
 
         await _dbContext.AddAsync(model);
         await _dbContext.SaveChangesAsync();
+        Log.Information("Added new ApiKey {@model} for userId {userId}", model, userId);
 
         return new ResultDto(model.Id != Guid.Empty);
     }
@@ -47,6 +49,7 @@ public class ApiKeyService : IApiKeyService
 
         _dbContext.ApiKeys.Remove(toDelete);
         await _dbContext.SaveChangesAsync();
+        Log.Information("Removed ApiKey {@model}", toDelete);
     }
 
     public async Task<ResultDto> UpdateNameAsync(Guid id, string name)
@@ -58,6 +61,7 @@ public class ApiKeyService : IApiKeyService
         toUpdate.Name = name;
         _dbContext.Update(toUpdate);
         await _dbContext.SaveChangesAsync();
+        Log.Information("Renamed ApiKey {@model}", toUpdate);
 
         return new ResultDto();
     }

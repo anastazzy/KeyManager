@@ -1,8 +1,10 @@
 ﻿using KeyManager.Application.Contracts;
 using KeyManager.Application.Dtos;
+using KeyManager.Application.Utils;
 using KeyManager.DataAccess;
 using KeysManager.Domain.Models;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace KeyManager.Application.Services;
 
@@ -14,7 +16,6 @@ public class TransactionService : ITransactionService
     private const string ErrorLowAccountBalance = "The transaction amount is more than the account balance. Transaction is not possible";
     private const string ErrorNotFoundTransaction = "The transaction was not reserved";
     private const string ErrorExpiredTransactionTime = "The transaction confirmation time has expired";
-    private const int TransactionTimeOutInMinuts = 10;
 
     public TransactionService(KeyManagerDbContext dbContext, IUserService userService)
     {
@@ -25,8 +26,11 @@ public class TransactionService : ITransactionService
     public async Task<ResultDto> ReserveSumAsync(Guid apiKeyId, decimal amount)
     {
         var user = await _userService.GetByApiKeyAsync(apiKeyId);
-        if (user.Balance < amount)
+        if (user is null || user.Balance < amount)
+        {
+            Log.Warning("Refused to create a transaction with low balance for user {@user}, amount {amount}", user, amount);
             return new ResultDto(false, ErrorLowAccountBalance);
+        }
 
         var transaction = new Transaction(amount, apiKeyId);
         await _dbContext.Transactions.AddAsync(transaction);
@@ -34,6 +38,7 @@ public class TransactionService : ITransactionService
         user.Balance -= amount;
         await _dbContext.SaveChangesAsync();
 
+        Log.Information("Created transaction {@transaction} for user {@user}", transaction, user);
         return new CreateTransactionResultDto(transaction.Id);
     }
 
@@ -41,16 +46,23 @@ public class TransactionService : ITransactionService
     {
         var transaction = await _dbContext.Transactions.FirstOrDefaultAsync(x => x.Id == transactionId);
         if (transaction is null)
+        {
+            Log.Error("Requested transaction not found {transactionId}", transactionId);
             return new ResultDto(false, ErrorNotFoundTransaction);
+        }
 
         var current = DateTime.UtcNow;
-        var isAlive = DateTime.UtcNow - transaction.CreateDateTime < TimeSpan.FromMinutes(TransactionTimeOutInMinuts);
+        var isAlive = DateTime.UtcNow - transaction.CreateDateTime < TimeSpan.FromMinutes(CommonConstants.TransactionTimeOutInMinutes);
         if (!isAlive)
+        {
+            Log.Warning("Requested transaction is expired {@transaction}", transaction);
             return new ResultDto(false, ErrorExpiredTransactionTime);
+        }
 
         transaction.ConfirmedAt = current;
         await _dbContext.SaveChangesAsync();
 
+        Log.Information("Transaction is confirmed {@transaction}", transaction);
         return new ResultDto();
     }
 }

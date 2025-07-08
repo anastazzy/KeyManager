@@ -10,8 +10,12 @@ using KeyManager.Infrastructure.Services;
 using KeyManager.MailService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+builder.Logging.ClearProviders();
+builder.Host.UseSerilog((context, configuration) => configuration.ReadFrom.Configuration(context.Configuration));
 
 builder.Services.AddDbContext<KeyManagerDbContext>(x =>
     x.UseNpgsql(builder.Configuration.GetConnectionString("Postgre")));
@@ -65,6 +69,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseSerilogRequestLogging();
 
 app.UseHttpsRedirection();
 

@@ -8,6 +8,7 @@ using KeyManager.MailService;
 using KeysManager.Domain.Models;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 
 namespace KeyManager.Application.Services;
 
@@ -54,18 +55,23 @@ public class UserService : IUserService
         await _dbContext.Users.AddAsync(user);
         await _dbContext.SaveChangesAsync();
 
+        Log.Information("Created user {@user}", user);
+
         var result = new ResultDto();
         var confirmationLink = QueryHelpers.AddQueryString(link, new Dictionary<string, string?> { { "token", user.ConfirmationCode } });
         try
         {
             await _emailService.SendEmailAsync(user.Email, MessageSubject, string.Format(MessageText, confirmationLink));
             result.Message = SuccessSendMessage;
+
+            Log.Information("Delivered email for confirmation to user {@user}", user);
         }
         catch (Exception e)
         {
             result.IsSuccess = false;
             result.Message = ErrorWhenMailWasNotSend;
-            Console.WriteLine(e);
+
+            Log.Error("Error when delivered email for confirmation to user {@user} {@e}", user, e);
             throw;
         }
 
@@ -87,6 +93,8 @@ public class UserService : IUserService
         {
             result.IsSuccess = false;
             result.Message = ErrorThenEmailNotConfirmed;
+
+            Log.Warning("User try to login. The email is not confirmed for user {@user}", user.Id);
             return result;
         }
 
@@ -95,6 +103,8 @@ public class UserService : IUserService
         {
             result.IsSuccess = false;
             result.Message = ErrorThenWrongPassword;
+
+            Log.Warning("Passwords don`t match for user {user}", user.Id);
             return result;
         }
 
@@ -116,16 +126,18 @@ public class UserService : IUserService
         user.IsEmailConfirmed = true;
         await _dbContext.SaveChangesAsync();
         result.Message = EmailSuccessfulConfirmed;
+
+        Log.Information("Success confirmed email for user {user}", user.Id);
         return result;
     }
 
-    public async Task<User> GetByApiKeyAsync(Guid apiKeyGuid)
+    public async Task<User?> GetByApiKeyAsync(Guid apiKeyGuid)
     {
         var key = await _dbContext.ApiKeys
             .Where(x => x.Id == apiKeyGuid)
             .Include(x => x.User)
             .FirstAsync();
-        
+
         return key.User;
     }
 }

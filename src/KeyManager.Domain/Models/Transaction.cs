@@ -9,7 +9,7 @@ public class Transaction
     public DateTime? ConfirmedAt { get; set; }
     public DateTime CreateDateTime { get; set; } = DateTime.UtcNow;
 
-    public Guid ApiKeyIdId { get; set; }
+    public Guid ApiKeyId { get; set; }
     public ApiKey? ApiKey { get; set; }
 
     public Transaction()
@@ -19,6 +19,6 @@ public class Transaction
     public Transaction(decimal amount, Guid apiKeyId)
     {
         Amount = amount;
-        ApiKeyIdId = apiKeyId;
+        ApiKeyId = apiKeyId;
     }
 }

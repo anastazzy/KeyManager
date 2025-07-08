@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace KeyManager.DataAccess.Migrations
 {
     [DbContext(typeof(KeyManagerDbContext))]
-    [Migration("20250609154946_init")]
+    [Migration("20250708135424_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -45,6 +45,24 @@ namespace KeyManager.DataAccess.Migrations
                     b.ToTable("ApiKeys");
                 });
 
+            modelBuilder.Entity("KeysManager.Domain.Models.ServiceApiKey", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ApiKey")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ServiceName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ServiceApiKeys");
+                });
+
             modelBuilder.Entity("KeysManager.Domain.Models.Transaction", b =>
                 {
                     b.Property<long>("Id")
@@ -56,10 +74,18 @@ namespace KeyManager.DataAccess.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric");
 
+                    b.Property<Guid>("ApiKeyId")
+                        .HasColumnType("uuid");
+
                     b.Property<DateTime?>("ConfirmedAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<DateTime>("CreateDateTime")
+                        .HasColumnType("timestamp with time zone");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("ApiKeyId");
 
                     b.ToTable("Transactions");
                 });
@@ -101,6 +127,17 @@ namespace KeyManager.DataAccess.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("KeysManager.Domain.Models.Transaction", b =>
+                {
+                    b.HasOne("KeysManager.Domain.Models.ApiKey", "ApiKey")
+                        .WithMany()
+                        .HasForeignKey("ApiKeyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApiKey");
                 });
 #pragma warning restore 612, 618
         }

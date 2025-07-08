@@ -71,10 +71,7 @@ namespace KeyManager.DataAccess.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("numeric");
 
-                    b.Property<Guid?>("ApiKeyId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ApiKeyIdId")
+                    b.Property<Guid>("ApiKeyId")
                         .HasColumnType("uuid");
 
                     b.Property<DateTime?>("ConfirmedAt")
@@ -133,7 +130,9 @@ namespace KeyManager.DataAccess.Migrations
                 {
                     b.HasOne("KeysManager.Domain.Models.ApiKey", "ApiKey")
                         .WithMany()
-                        .HasForeignKey("ApiKeyId");
+                        .HasForeignKey("ApiKeyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("ApiKey");
                 });
