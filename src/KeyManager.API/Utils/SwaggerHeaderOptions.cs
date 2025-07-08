@@ -2,12 +2,11 @@
 using Microsoft.OpenApi.Models;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
-namespace KeyManager.API.Extensions;
+namespace KeyManager.API.Utils;
 
 public class SwaggerHeaderOptions : IOperationFilter
 {
     private const string Description = "Need to set the service api key";
-    private const string AuthFieldName = "Authorization";
     public void Apply(OpenApiOperation operation, OperationFilterContext context)
     {
         var isServiceKeyAuthorization = context.ApiDescription.ActionDescriptor.EndpointMetadata
@@ -16,7 +15,7 @@ public class SwaggerHeaderOptions : IOperationFilter
 
         (operation.Parameters ??= new List<OpenApiParameter>()).Add(new OpenApiParameter
         {
-            Name = AuthFieldName,
+            Name = AuthConst.AuthFieldName,
             In = ParameterLocation.Header,
             Description = Description,
             Required = false,

@@ -1,4 +1,4 @@
-﻿using KeyManager.API.Extensions;
+﻿using KeyManager.API.Utils;
 using KeyManager.Application.Contracts;
 using KeyManager.Application.Requests;
 using Microsoft.AspNetCore.Mvc;

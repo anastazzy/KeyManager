@@ -1,4 +1,5 @@
 using KeyManager.API.Extensions;
+using KeyManager.API.Utils;
 using KeyManager.Application.Contracts;
 using KeyManager.Application.Services;
 using KeyManager.DataAccess;

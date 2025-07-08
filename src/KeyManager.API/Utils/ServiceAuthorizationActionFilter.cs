@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace KeyManager.API.Extensions;
+namespace KeyManager.API.Utils;
 
 public class ServiceAuthorizationActionFilter : IAsyncActionFilter
 {
@@ -15,16 +15,17 @@ public class ServiceAuthorizationActionFilter : IAsyncActionFilter
 
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
-        if (await IsAuthorizationSuccessAsync(context, next)) await next();
+        if (await IsAuthorizationSuccessAsync(context)) await next();
     }
 
-    public async Task<bool> IsAuthorizationSuccessAsync(ActionExecutingContext context, ActionExecutionDelegate next)
+    private async Task<bool> IsAuthorizationSuccessAsync(ActionExecutingContext context)
     {
         var request = context.HttpContext.Request.Headers;
         var notAuthorizedResult = new ObjectResult(null) { StatusCode = 401 };
-        if (!(request.TryGetValue("Authorization", out var header)
-              || !request.TryGetValue("authorization", out header))
-            || !Guid.TryParse(header, out var apikey) 
+
+        if (!(request.TryGetValue(AuthConst.AuthFieldName, out var header)
+              || !request.TryGetValue(AuthConst.AuthFieldName.ToLower(), out header))
+            || !Guid.TryParse(header, out var apikey)
             || !await _manager.IsRegisteredAsync(apikey))
         {
             context.Result = notAuthorizedResult;
