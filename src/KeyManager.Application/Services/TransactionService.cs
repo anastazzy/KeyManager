@@ -24,18 +24,17 @@ public class TransactionService : ITransactionService
 
     public async Task<ResultDto> ReserveSumAsync(Guid apiKeyId, decimal amount)
     {
-        var transaction = new Transaction(amount, apiKeyId);
-        await _dbContext.Transactions.AddAsync(transaction);
-        await _dbContext.SaveChangesAsync();
-
         var user = await _userService.GetByApiKeyAsync(apiKeyId);
         if (user.Balance < amount)
             return new ResultDto(false, ErrorLowAccountBalance);
 
+        var transaction = new Transaction(amount, apiKeyId);
+        await _dbContext.Transactions.AddAsync(transaction);
+
         user.Balance -= amount;
         await _dbContext.SaveChangesAsync();
 
-        return new ResultDto();
+        return new CreateTransactionResultDto(transaction.Id);
     }
 
     public async Task<ResultDto> ConfirmTransactionAsync(Guid apiKeyId, long transactionId)
@@ -46,7 +45,7 @@ public class TransactionService : ITransactionService
 
         var current = DateTime.UtcNow;
         var isAlive = DateTime.UtcNow - transaction.CreateDateTime < TimeSpan.FromMinutes(TransactionTimeOutInMinuts);
-        if (isAlive)
+        if (!isAlive)
             return new ResultDto(false, ErrorExpiredTransactionTime);
 
         transaction.ConfirmedAt = current;
