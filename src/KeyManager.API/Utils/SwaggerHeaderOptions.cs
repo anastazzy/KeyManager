@@ -18,8 +18,7 @@ public class SwaggerHeaderOptions : IOperationFilter
             Name = AuthConst.AuthFieldName,
             In = ParameterLocation.Header,
             Description = Description,
-            Required = false,
-            AllowEmptyValue = true,
+            Required = true,
             Style = ParameterStyle.Simple,
         });
     }

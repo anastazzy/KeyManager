@@ -2,5 +2,5 @@
 
 public static class AuthConst
 {
-    public const string AuthFieldName = "Authorization";
+    public const string AuthFieldName = "Api_key";
 }

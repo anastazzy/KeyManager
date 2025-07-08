@@ -54,7 +54,7 @@ builder.Services.AddSwaggerGen(options =>
             Array.Empty<string>()
         }
     });
-    options.AddOperationFilterInstance(new SwaggerHeaderOptions());
+    options.OperationFilter<SwaggerHeaderOptions>();
 });
 
 var app = builder.Build();
