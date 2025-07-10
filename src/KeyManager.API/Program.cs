@@ -8,6 +8,7 @@ using KeyManager.Infrastructure.Contracts;
 using KeyManager.Infrastructure.Dtos;
 using KeyManager.Infrastructure.Services;
 using KeyManager.MailService;
+using Laraue.Core.Exceptions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Serilog;
@@ -30,6 +31,7 @@ builder.Services.AddTransient<IServiceApiKeyManager, ServiceApiKeyManager>();
 builder.Services.AddHostedService<TransactionLifetimeChecker>();
 
 builder.Services.AddScoped<ServiceAuthorizationActionFilter>();
+builder.Services.AddScoped<ExceptionHandleMiddleware>();
 
 builder.Services.Configure<JwtOptions>(builder.Configuration.GetSection("JwtOptions"));
 builder.Services.Configure<SmtpOptions>(builder.Configuration.GetSection("SmtpOptions"));
@@ -77,5 +79,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.UseMiddleware<ExceptionHandleMiddleware>();
 
 app.Run();

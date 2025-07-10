@@ -1,11 +1,11 @@
 ﻿using System.Text;
 using KeyManager.Application.Contracts;
-using KeyManager.Application.Dtos;
 using KeyManager.Application.Requests;
 using KeyManager.DataAccess;
 using KeyManager.Infrastructure.Contracts;
 using KeyManager.MailService;
 using KeysManager.Domain.Models;
+using Laraue.Core.Exceptions.Web;
 using Microsoft.AspNetCore.WebUtilities;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
@@ -23,9 +23,8 @@ public class UserService : IUserService
     private const string DateTimeFormat = "MM/dd/yyyy HH:mm:ss";
     private const string ErrorUserAlreadyExists = "User with such email already exists";
     private const string ErrorWhenMailWasNotSend = "Аn error occurred while sending the message";
-    private const string SuccessSendMessage = "An email has been sent to the specified email address. Confirm your login by clicking on the link from the email.";
 
-    private const string ErrorThenEmailNotExists = "Email not registered in system";
+    private const string ErrorThenWrongToken = "Error of confirmation, wrong tokem";
     private const string ErrorThenEmailNotConfirmed = "Email not confirmed";
     private const string ErrorThenWrongPassword = "Wrong passsword";
 
@@ -39,10 +38,10 @@ public class UserService : IUserService
         _emailService = emailService;
     }
 
-    public async Task<ResultDto> RegisterAsync(LoginUserRequest request, string link)
+    public async Task RegisterAsync(LoginUserRequest request, string link)
     {
         if (await _dbContext.Users.AnyAsync(x => x.Email == request.Email))
-            return new ResultDto(false, ErrorUserAlreadyExists);
+            throw new BadRequestException(nameof(request.Email), ErrorUserAlreadyExists);
 
         var hash = _passwordHasher.GetHash(request.Password);
         var confirmationCode = Convert.ToBase64String(Encoding.ASCII
@@ -57,78 +56,54 @@ public class UserService : IUserService
 
         Log.Information("Created user {@user}", user);
 
-        var result = new ResultDto();
         var confirmationLink = QueryHelpers.AddQueryString(link, new Dictionary<string, string?> { { "token", user.ConfirmationCode } });
         try
         {
             await _emailService.SendEmailAsync(user.Email, MessageSubject, string.Format(MessageText, confirmationLink));
-            result.Message = SuccessSendMessage;
 
             Log.Information("Delivered email for confirmation to user {@user}", user);
         }
         catch (Exception e)
         {
-            result.IsSuccess = false;
-            result.Message = ErrorWhenMailWasNotSend;
-
             Log.Error("Error when delivered email for confirmation to user {@user} {@e}", user, e);
-            throw;
+            throw new BadRequestException(string.Empty, ErrorWhenMailWasNotSend);
         }
-
-        return result;
     }
 
-    public async Task<LoginResultDto> LoginAsync(LoginUserRequest request)
+    public async Task<string> LoginAsync(LoginUserRequest request)
     {
-        var result = new LoginResultDto();
         var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == request.Email);
         if (user is null)
-        {
-            result.IsSuccess = false;
-            result.Message = ErrorThenEmailNotExists;
-            return result;
-        }
+            throw new BadRequestException(nameof(request.Email), ErrorThenWrongToken);
 
         if (!user.IsEmailConfirmed)
         {
-            result.IsSuccess = false;
-            result.Message = ErrorThenEmailNotConfirmed;
-
             Log.Warning("User try to login. The email is not confirmed for user {@user}", user.Id);
-            return result;
+            throw new BadRequestException(nameof(request.Email), ErrorThenEmailNotConfirmed);
         }
 
         var isPasswordMatches = _passwordHasher.Verify(request.Password, user.Password);
         if (!isPasswordMatches)
         {
-            result.IsSuccess = false;
-            result.Message = ErrorThenWrongPassword;
-
             Log.Warning("Passwords don`t match for user {user}", user.Id);
-            return result;
+            throw new BadRequestException(nameof(request.Password), ErrorThenWrongPassword);
         }
 
-        result.Token = _jwtProvider.GenerateAccessJwtToken(user.Id, user.Email);
-        return result;
+        Log.Information("Login in system {user}", user.Id);
+        return _jwtProvider.GenerateAccessJwtToken(user.Id, user.Email);
     }
 
-    public async Task<ResultDto> ConfirmEmailAsync(string token)
+    public async Task<string> ConfirmEmailAsync(string token)
     {
-        var result = new ResultDto();
         var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.ConfirmationCode == token);
         if (user is null)
-        {
-            result.IsSuccess = false;
-            result.Message = ErrorThenEmailNotExists;
-            return result;
-        }
+            throw new BadRequestException(nameof(token), ErrorThenWrongToken);
 
         user.IsEmailConfirmed = true;
         await _dbContext.SaveChangesAsync();
-        result.Message = EmailSuccessfulConfirmed;
 
         Log.Information("Success confirmed email for user {user}", user.Id);
-        return result;
+        return EmailSuccessfulConfirmed;
     }
 
     public async Task<User?> GetByApiKeyAsync(Guid apiKeyGuid)

@@ -16,23 +16,20 @@ public class UserController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> RegisterAsync([FromBody] LoginUserRequest request)
+    public async Task RegisterAsync([FromBody] LoginUserRequest request)
     {
-        var result = await _userService.RegisterAsync(request, $"{Url.ActionLink()}/confirmation");
-        return result.IsSuccess ? Ok(result) : BadRequest(result);
+        await _userService.RegisterAsync(request, $"{Url.ActionLink()}/confirmation");
     }
 
     [HttpPost("login")]
-    public async Task<ActionResult> LoginAsync([FromBody] LoginUserRequest request)
+    public async Task<string> LoginAsync([FromBody] LoginUserRequest request)
     {
-        var result = await _userService.LoginAsync(request);
-        return result.IsSuccess ? Ok(result) : BadRequest(result);
+        return await _userService.LoginAsync(request);
     }
 
     [HttpGet("confirmation")]
-    public async Task<ActionResult> ConfirmEmailAsync([FromQuery] string token)
+    public async Task<string> ConfirmEmailAsync([FromQuery] string token)
     {
-        var result = await _userService.ConfirmEmailAsync(token);
-        return result.IsSuccess ? Ok(result) : BadRequest(result);
+        return await _userService.ConfirmEmailAsync(token);
     }
 }
