@@ -7,6 +7,6 @@ public interface IUserService
 {
     Task RegisterAsync(LoginUserRequest request, string link);
     Task<string> LoginAsync(LoginUserRequest request);
-    Task<string> ConfirmEmailAsync(string token);
+    Task ConfirmEmailAsync(string token);
     Task<User?> GetByApiKeyAsync(Guid apiKeyGuid);
 }

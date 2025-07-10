@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
+using KeyManager.API.Dtos;
 using KeyManager.Application.Contracts;
-using KeyManager.Application.Dtos;
 using KeyManager.Application.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,10 +20,12 @@ public class ApiKeyController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<List<KeyDto>> GetApiKeysByUserAsync()
+    public async Task<EnumerableResultContainer> GetApiKeysByUserAsync()
     {
         var id = GetUserId();
-        return await _apiKeyService.GetUserKeysAsync(id);
+        var keys = await _apiKeyService.GetUserKeysAsync(id);
+
+        return new EnumerableResultContainer(keys);
     }
 
     [HttpPost]

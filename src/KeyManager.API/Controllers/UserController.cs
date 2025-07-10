@@ -1,4 +1,5 @@
-﻿using KeyManager.Application.Contracts;
+﻿using KeyManager.API.Dtos;
+using KeyManager.Application.Contracts;
 using KeyManager.Application.Requests;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,14 +23,15 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<string> LoginAsync([FromBody] LoginUserRequest request)
+    public async Task<StringResultContainer> LoginAsync([FromBody] LoginUserRequest request)
     {
-        return await _userService.LoginAsync(request);
+        var token = await _userService.LoginAsync(request);
+        return new StringResultContainer(token);
     }
 
     [HttpGet("confirmation")]
-    public async Task<string> ConfirmEmailAsync([FromQuery] string token)
+    public async Task ConfirmEmailAsync([FromQuery] string token)
     {
-        return await _userService.ConfirmEmailAsync(token);
+        await _userService.ConfirmEmailAsync(token);
     }
 }

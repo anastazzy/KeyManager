@@ -18,12 +18,12 @@ public class ApiKeyService : IApiKeyService
         _dbContext = dbContext;
     }
 
-    public async Task<List<KeyDto>> GetUserKeysAsync(Guid userId)
+    public async Task<Array> GetUserKeysAsync(Guid userId)
     {
         var result = await _dbContext.ApiKeys
             .Where(x => x.UserId == userId)
             .Select(x => new KeyDto(x.Id, x.Name))
-            .ToListAsync();
+            .ToArrayAsync();
 
         return result;
     }

@@ -93,7 +93,7 @@ public class UserService : IUserService
         return _jwtProvider.GenerateAccessJwtToken(user.Id, user.Email);
     }
 
-    public async Task<string> ConfirmEmailAsync(string token)
+    public async Task ConfirmEmailAsync(string token)
     {
         var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.ConfirmationCode == token);
         if (user is null)
@@ -103,7 +103,6 @@ public class UserService : IUserService
         await _dbContext.SaveChangesAsync();
 
         Log.Information("Success confirmed email for user {user}", user.Id);
-        return EmailSuccessfulConfirmed;
     }
 
     public async Task<User?> GetByApiKeyAsync(Guid apiKeyGuid)
