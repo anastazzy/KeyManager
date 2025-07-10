@@ -3,6 +3,7 @@ using KeyManager.Application.Dtos;
 using KeyManager.Application.Utils;
 using KeyManager.DataAccess;
 using KeysManager.Domain.Models;
+using Laraue.Core.Exceptions.Web;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -23,13 +24,13 @@ public class TransactionService : ITransactionService
         _userService = userService;
     }
 
-    public async Task<ResultDto> ReserveSumAsync(Guid apiKeyId, decimal amount)
+    public async Task<ReverseSumSuccessDto> ReserveSumAsync(Guid apiKeyId, decimal amount)
     {
         var user = await _userService.GetByApiKeyAsync(apiKeyId);
         if (user is null || user.Balance < amount)
         {
             Log.Warning("Refused to create a transaction with low balance for user {@user}, amount {amount}", user, amount);
-            return new ResultDto(false, ErrorLowAccountBalance);
+            throw new BadRequestException(nameof(apiKeyId), ErrorLowAccountBalance);
         }
 
         var transaction = new Transaction(amount, apiKeyId);
@@ -39,16 +40,16 @@ public class TransactionService : ITransactionService
         await _dbContext.SaveChangesAsync();
 
         Log.Information("Created transaction {@transaction} for user {@user}", transaction, user);
-        return new CreateTransactionResultDto(transaction.Id);
+        return new ReverseSumSuccessDto(transaction.Id);
     }
 
-    public async Task<ResultDto> ConfirmTransactionAsync(Guid apiKeyId, long transactionId)
+    public async Task ConfirmTransactionAsync(Guid apiKeyId, long transactionId)
     {
         var transaction = await _dbContext.Transactions.FirstOrDefaultAsync(x => x.Id == transactionId);
         if (transaction is null)
         {
             Log.Error("Requested transaction not found {transactionId}", transactionId);
-            return new ResultDto(false, ErrorNotFoundTransaction);
+            throw new BadRequestException(nameof(transactionId), ErrorNotFoundTransaction);
         }
 
         var current = DateTime.UtcNow;
@@ -56,13 +57,12 @@ public class TransactionService : ITransactionService
         if (!isAlive)
         {
             Log.Warning("Requested transaction is expired {@transaction}", transaction);
-            return new ResultDto(false, ErrorExpiredTransactionTime);
+            throw new BadRequestException(nameof(transactionId), ErrorExpiredTransactionTime);
         }
 
         transaction.ConfirmedAt = current;
         await _dbContext.SaveChangesAsync();
 
         Log.Information("Transaction is confirmed {@transaction}", transaction);
-        return new ResultDto();
     }
 }

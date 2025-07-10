@@ -1,5 +1,6 @@
 ﻿using KeyManager.API.Utils;
 using KeyManager.Application.Contracts;
+using KeyManager.Application.Dtos;
 using KeyManager.Application.Requests;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,16 +19,14 @@ public class TransactionController : ControllerBase
     }
 
     [HttpPost("reserve")]
-    public async Task<ActionResult> ReserveSumAsync([FromBody] ReserveSumRequest request)
+    public async Task<ReverseSumSuccessDto> ReserveSumAsync([FromBody] ReserveSumRequest request)
     {
-        var result = await _transactionService.ReserveSumAsync(request.ApiKeiId, request.Sum);
-        return result.IsSuccess ? Ok(result) : BadRequest(result);
+        return await _transactionService.ReserveSumAsync(request.ApiKeiId, request.Sum);
     }
 
     [HttpPost("confirm")]
-    public async Task<ActionResult> ConfirmAsync([FromBody] ConfirmTransactionRequest request)
+    public async Task ConfirmAsync([FromBody] ConfirmTransactionRequest request)
     {
-        var result = await _transactionService.ConfirmTransactionAsync(request.ApiKeiId, request.TransactionId);
-        return result.IsSuccess ? Ok(result) : BadRequest(result);
+        await _transactionService.ConfirmTransactionAsync(request.ApiKeiId, request.TransactionId);
     }
 }
