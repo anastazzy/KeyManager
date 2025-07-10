@@ -2,6 +2,7 @@
 using KeyManager.Application.Dtos;
 using KeyManager.DataAccess;
 using KeysManager.Domain.Models;
+using Laraue.Core.Exceptions.Web;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
 
@@ -27,7 +28,7 @@ public class ApiKeyService : IApiKeyService
         return result;
     }
 
-    public async Task<ResultDto> AddKeyAsync(Guid userId, string name)
+    public async Task AddKeyAsync(Guid userId, string name)
     {
         var model = new ApiKey
         {
@@ -37,9 +38,8 @@ public class ApiKeyService : IApiKeyService
 
         await _dbContext.AddAsync(model);
         await _dbContext.SaveChangesAsync();
-        Log.Information("Added new ApiKey {@model} for userId {userId}", model, userId);
 
-        return new ResultDto(model.Id != Guid.Empty);
+        Log.Information("Added new ApiKey {@model} for userId {userId}", model, userId);
     }
 
     public async Task RemoveKeyAsync(Guid id)
@@ -52,17 +52,16 @@ public class ApiKeyService : IApiKeyService
         Log.Information("Removed ApiKey {@model}", toDelete);
     }
 
-    public async Task<ResultDto> UpdateNameAsync(Guid id, string name)
+    public async Task UpdateNameAsync(Guid id, string name)
     {
         var toUpdate = await _dbContext.ApiKeys.FirstOrDefaultAsync(x => x.Id == id);
         if (toUpdate is null)
-            return new ResultDto(false, ApiKeyNotExists);
+            throw new BadRequestException(nameof(id), ApiKeyNotExists);
 
         toUpdate.Name = name;
         _dbContext.Update(toUpdate);
         await _dbContext.SaveChangesAsync();
-        Log.Information("Renamed ApiKey {@model}", toUpdate);
 
-        return new ResultDto();
+        Log.Information("Renamed ApiKey {@model}", toUpdate);
     }
 }

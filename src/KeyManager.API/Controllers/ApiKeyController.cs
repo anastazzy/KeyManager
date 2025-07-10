@@ -1,5 +1,6 @@
 ﻿using System.Security.Claims;
 using KeyManager.Application.Contracts;
+using KeyManager.Application.Dtos;
 using KeyManager.Application.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -19,33 +20,29 @@ public class ApiKeyController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult> GetApiKeysByUserAsync()
+    public async Task<List<KeyDto>> GetApiKeysByUserAsync()
     {
         var id = GetUserId();
-        var result = await _apiKeyService.GetUserKeysAsync(id);
-        return Ok(result);
+        return await _apiKeyService.GetUserKeysAsync(id);
     }
 
     [HttpPost]
-    public async Task<ActionResult> AddApiKeyAsync([FromBody] ApiKeyAddRequest request)
+    public async Task AddApiKeyAsync([FromBody] ApiKeyAddRequest request)
     {
         var id = GetUserId();
-        var result = await _apiKeyService.AddKeyAsync(id, request.Name);
-        return Ok(result);
+        await _apiKeyService.AddKeyAsync(id, request.Name);
     }
 
     [HttpDelete("{id}")]
-    public async Task<ActionResult> RemoveApiKeyAsync([FromRoute] Guid id)
+    public async Task RemoveApiKeyAsync([FromRoute] Guid id)
     {
         await _apiKeyService.RemoveKeyAsync(id);
-        return Ok();
     }
 
     [HttpPut("{id}")]
-    public async Task<ActionResult> UpdateNameAsync([FromRoute] Guid id, [FromBody] ApiKeyAddRequest request)
+    public async Task UpdateNameAsync([FromRoute] Guid id, [FromBody] ApiKeyAddRequest request)
     {
         await _apiKeyService.UpdateNameAsync(id, request.Name);
-        return Ok();
     }
 
     private Guid GetUserId() => Guid.TryParse(
